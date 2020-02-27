@@ -2349,6 +2349,7 @@ export enum StatusCode {
   scgenericapierror = 1600,
   scapinetworkerror = 1601,
   sctimeout = 1602,
+  sckbfsclienttimeout = 1603,
   scprooferror = 1701,
   scidentificationexpired = 1702,
   scselfnotfound = 1703,
