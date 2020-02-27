@@ -12,6 +12,7 @@ export type _Props = {
   error?: boolean
   hoverPlaceholder?: string
   placeholder: string
+  label?: string // If different from the placeholder
 }
 
 export type Props = PropsWithInput<_Props>
@@ -55,7 +56,7 @@ const ReflessLabeledInput = (props: Props & RefProps) => {
   const computedContainerSize =
     textStyle.fontSize + (isMobile ? 48 : 38) + (multiline ? textStyle.fontSize : 0)
 
-  const {containerStyle, error, forwardedRef, placeholder, ...plainInputProps} = props
+  const {containerStyle, error, forwardedRef, label, placeholder, ...plainInputProps} = props
   return (
     <Box2
       direction="vertical"
@@ -83,12 +84,25 @@ const ReflessLabeledInput = (props: Props & RefProps) => {
           style={Styles.collapseStyles([
             styles.label,
             props.placeholderColor && {color: props.placeholderColor},
-            collapsed ? styles.labelSmall : styles.labelLarge,
+            collapsed || !!label ? styles.labelSmall : styles.labelLarge,
             focused && styles.labelFocused,
           ])}
         >
-          {placeholder}
+          {label ?? placeholder}
         </Text>
+        {!!label && !collapsed && (
+          <Text
+            type={isMobile ? 'BodySemibold' : 'BodySmallSemibold'}
+            style={Styles.collapseStyles([
+              styles.label,
+              props.placeholderColor && {color: props.placeholderColor},
+              styles.labelLarge,
+              focused && styles.labelFocused,
+            ])}
+          >
+            {placeholder}
+          </Text>
+        )}
       </Box2>
 
       <PlainInput

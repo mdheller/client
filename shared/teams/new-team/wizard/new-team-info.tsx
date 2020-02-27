@@ -3,7 +3,11 @@ import * as Kb from '../../../common-adapters'
 import * as Container from '../../../util/container'
 import * as Styles from '../../../styles'
 import {ModalTitle} from '../../common'
-import setDescription from 'chat/conversation/messages/set-description'
+import * as Types from '../../../constants/types/teams'
+import {pluralize} from '../../../util/string'
+import capitalize from 'lodash/capitalize'
+import {InlineDropdown} from '../../../common-adapters/dropdown'
+import {FloatingRolePicker} from '../../role-picker'
 
 const NewTeamInfo = () => {
   const dispatch = Container.useDispatch()
@@ -17,6 +21,8 @@ const NewTeamInfo = () => {
   const teamNameTaken = false // TODO: get this live
   const [openTeam, setOpenTeam] = React.useState(teamType === 'community')
   const [showcase, setShowcase] = React.useState(teamType !== 'other')
+  const [selectedRole, setSelectedRole] = React.useState<Types.TeamRoleType>('writer')
+  const [rolePickerIsOpen, setRolePickerIsOpen] = React.useState(false)
 
   return (
     <Kb.Modal
@@ -53,6 +59,7 @@ const NewTeamInfo = () => {
           onChangeText={setDescription}
           maxLength={280}
         />
+
         <Kb.Checkbox
           labelComponent={
             <Kb.Box2 direction="vertical" alignItems="flex-start">
@@ -61,7 +68,21 @@ const NewTeamInfo = () => {
               {openTeam && (
                 <Kb.Box2 direction="horizontal" gap="xtiny" alignSelf="flex-start">
                   <Kb.Text type="BodySmall">People will join as</Kb.Text>
-                  <Kb.Dropdown items={['Admins', 'Writers', 'Readers']} style={styles.roleDropdown} />
+                  <FloatingRolePicker
+                    confirmLabel={`Let in as ${capitalize(pluralize(selectedRole))}`}
+                    selectedRole={selectedRole}
+                    onSelectRole={setSelectedRole}
+                    floatingContainerStyle={styles.floatingRolePicker}
+                    onConfirm={() => setRolePickerIsOpen(false)}
+                    position="bottom center"
+                    open={rolePickerIsOpen}
+                  >
+                    <InlineDropdown
+                      label={pluralize(selectedRole)}
+                      onPress={() => setRolePickerIsOpen(!rolePickerIsOpen)}
+                      type="BodySmall"
+                    />
+                  </FloatingRolePicker>
                 </Kb.Box2>
               )}
             </Kb.Box2>
@@ -93,6 +114,12 @@ const styles = Styles.styleSheetCreate(() => ({
   container: {
     padding: Styles.globalMargins.small,
   },
+  floatingRolePicker: Styles.platformStyles({
+    isElectron: {
+      position: 'relative',
+      top: -20,
+    },
+  }),
   wordBreak: Styles.platformStyles({
     isElectron: {
       wordBreak: 'break-all',
